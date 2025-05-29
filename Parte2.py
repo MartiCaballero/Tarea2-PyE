@@ -1,78 +1,80 @@
-# Simulación de variable aleatoria uniforme continua en [0,1]
-import time
-
-a= 1664525
-c = 1013904223
-m = 2**32
-
-semilla = int(time.time()*1000) % m
-
-def generar_uniforme(): 
-    global semilla
-    semilla = (a * semilla + c) % m
-    return semilla / m
-
-# Generar una muestra de 100 variables uniformes
-# Crear histograma y densidad
-
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-def muestra_uniforme():
-    muestra = [generar_uniforme() for _ in range(100)]
-
-    sns.histplot(muestra, bins=10, kde=True, stat='density', color='purple', edgecolor='black')
-    plt.title('Uniforme [0,1]: Histograma y Densidad estimada')
-    plt.xlabel('Valor')
-    plt.ylabel('Frecuencia')
-    plt.grid(True)
-    plt.show()
-
-    return muestra
-
-#Demostración teórica de la transormada inversa
-def transformada_inversa(): 
-    """
-    Si U ~ U[0,1] y F es estrictamente creciente, entonces: 
-    X = F^(-1)(U) tiene distribución acumulada F
-
-    Demostración: 
-    P (X ≤ x) = P(F^(-1)(U) ≤ x) = P(U ≤ F(x)) 
-
-    Por lo tanto, X ~ F
-    """
-
-    pass
-
-#Algoritmo para generar variables con distribución Cauchy estándar
-import math 
-def generar_cauchy():
-    u = generar_uniforme()
-    return math.tan(math.pi * (u - 0.5))
-
-
-# Generar muestra de Couchy + gráfico 
 import numpy as np
 from scipy.stats import cauchy
 
-def muestra_cauchy():
-    muestra = [generar_cauchy() for _ in range(100)]
 
-    sns.histplot (muestra, kde= True, stat='density', color='orange', edgecolor='black', label= 'Densidad estimada')
+# Simulación de variable aleatoria uniforme continua en [0,1]
+class UniformeGenerador:
+    def __init__(self, semilla=123456789, a=1103515245, m=2**31):
+        self.semilla = semilla
+        self.a = a
+        self.m = m
+        self.estado = semilla
 
-    x_vals = np.linspace(-10, 10, 1000)
-    plt.plt (x_vals, cauchy.pdf(x_vals), label="Densidad Cauchy Teórica"), color= "blue"
+    def siguiente(self):
+        self.estado = (self.a * self.estado) % self.m
+        return self.estado / self.m
+    
 
-    plt.title("Cauchy estándar: Histograma, KDE y densidad teórica")
+# Generar una muestra de 100 variables uniformes
+# Crear histograma y densidad
+def generar_muestra_uniforme(generador, n=100):
+    return [generador.siguiente() for _ in range(n)]
+
+def graficar_histograma_y_densidad_uniforme(muestra):
+    plt.figure(figsize=(8, 5))
+    sns.histplot(muestra, bins=10, kde=True, stat='density', color='skyblue')
+    plt.title("Histograma + Densidad KDE de muestra U[0,1]")
     plt.xlabel("Valor")
     plt.ylabel("Densidad")
+    plt.grid(True)
+    plt.show()
+
+#Teorema de la transformación inversa
+#Se explica demostración teórica 
+
+
+# Simulación de Cauchy estándar
+# FX(t) = (1/pi) * arctan(t) + 1/2  => F^{-1}(u) = tan(pi(u - 0.5))
+
+def inversa_cauchy(u):
+    return np.tan(np.pi * (u - 0.5))
+
+
+def generar_muestra_cauchy(muestra_uniforme):
+    return [inversa_cauchy(u) for u in muestra_uniforme]
+
+
+
+# Graficar muestra Cauchy
+def graficar_histograma_y_densidad_cauchy(muestra):
+    
+    sns.histplot(muestra, bins=100, kde=True, stat="density", color="pink", edgecolor="black")
+    
+    x = np.linspace(-25, 25, 1000)
+    y = cauchy.pdf(x)
+    
+    plt.plot(x, y, label="Densidad Cauchy estándar", color="blue")
+    plt.title("Histograma y Densidad - Muestra Cauchy")
+    plt.xlabel("Valor")
+    plt.ylabel("Densidad")
+    plt.xlim(-25, 25)
     plt.legend()
     plt.grid(True)
     plt.show()
 
-    return muestra
 
+#Ejecución del código
 
-#Para ejecutar: 
-muestra_uniforme()
-muestra_cauchy()
+if __name__ == "__main__":
+    # Parte 1: Inicializar generador
+    generador = UniformeGenerador()
+
+    # Parte 2: Muestra de 100 uniformes
+    muestra_uniforme = generar_muestra_uniforme(generador, 100)
+    graficar_histograma_y_densidad_uniforme(muestra_uniforme)
+
+    # Parte 4-5: Simulación Cauchy
+    muestra_cauchy = generar_muestra_cauchy(muestra_uniforme)
+    graficar_histograma_y_densidad_cauchy(muestra_cauchy)
