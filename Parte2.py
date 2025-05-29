@@ -32,7 +32,24 @@ def graficar_histograma_y_densidad_uniforme(muestra):
     plt.show()
 
 #Teorema de la transformación inversa
-#Se explica demostración teórica 
+#Demostrar que si U ∼ U[0, 1] y F es una funci´on de distribuci´on acumulada estrictamente creciente
+#entonces la variable aleatoria X = F^−1(U) tiene a F como su funci´on de distribuci´on acumulada
+#(es decir FX = F).
+"""
+Demostración del Teorema de la Transformación Inversa:
+
+Sea U ~ Uniforme(0,1), y sea F una función de distribución acumulada estrictamente creciente con inversa F^{-1}.
+
+Definimos X = F^{-1}(U). Queremos probar que la función de distribución de X es F.
+
+Para cualquier t ∈ ℝ, se tiene:
+P(X ≤ t) = P(F^{-1}(U) ≤ t)
+         = P(U ≤ F(t))   (porque F es estrictamente creciente ⇒ F^{-1} también)
+         = F(t)           (ya que U ~ U(0,1))
+
+Entonces, X tiene distribución acumulada F, es decir, X ~ F.
+"""
+
 
 
 # Simulación de Cauchy estándar
@@ -78,3 +95,8 @@ if __name__ == "__main__":
     # Parte 4-5: Simulación Cauchy
     muestra_cauchy = generar_muestra_cauchy(muestra_uniforme)
     graficar_histograma_y_densidad_cauchy(muestra_cauchy)
+
+    print("Resumen estadístico de muestra Cauchy:")
+    print(f"Media: {np.mean(muestra_cauchy):.2f}")
+    print(f"Mediana: {np.median(muestra_cauchy):.2f}")
+    print(f"Desviación estándar: {np.std(muestra_cauchy):.2f}")
